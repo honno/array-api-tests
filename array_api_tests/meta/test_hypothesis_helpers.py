@@ -128,10 +128,12 @@ def test_specified_kwargs():
     assert any("d" in kw.keys() and kw["d"] is xp.float64 for kw in results)
 
 
+shared_floating_dtypes_strat = st.shared(xps.floating_dtypes(), key="dtype")
 
-@given(m=hh.symmetric_matrices(hh.shared_floating_dtypes,
+
+@given(m=hh.symmetric_matrices(shared_floating_dtypes_strat,
                                      finite=st.shared(st.booleans(), key='finite')),
-       dtype=hh.shared_floating_dtypes,
+       dtype=shared_floating_dtypes_strat,
        finite=st.shared(st.booleans(), key='finite'))
 def test_symmetric_matrices(m, dtype, finite):
     assert m.dtype == dtype
@@ -141,8 +143,8 @@ def test_symmetric_matrices(m, dtype, finite):
     if finite:
         ah.assert_finite(m)
 
-@given(m=hh.positive_definite_matrices(hh.shared_floating_dtypes),
-       dtype=hh.shared_floating_dtypes)
+@given(m=hh.positive_definite_matrices(shared_floating_dtypes_strat),
+       dtype=shared_floating_dtypes_strat)
 def test_positive_definite_matrices(m, dtype):
     assert m.dtype == dtype
     # TODO: Test that it actually is positive definite
